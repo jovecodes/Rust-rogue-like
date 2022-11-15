@@ -1,6 +1,3 @@
-use super::dungeon::Dungeon;
-
-
 fn make_pretty(dungeon: Dungeon) {
     to_do();
 
