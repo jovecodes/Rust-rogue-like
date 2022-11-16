@@ -21,5 +21,10 @@ impl Position {
             _ => return STOP
         }
     }
+
+    pub fn add(&mut self, pos: Position) {
+        self.x += pos.x;
+        self.y += pos.y;
+    } 
 }
 

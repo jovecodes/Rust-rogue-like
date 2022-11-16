@@ -1,4 +1,4 @@
-pub const EMPTY_ROOM: Room = Room{art: '#'};
+//pub const EMPTY_ROOM: Room = Room{art: '#'};
 pub const OPEN_ROOM:  Room = Room{art: '.'};
 pub const GOAL_ROOM:  Room = Room{art: 'G'};
 

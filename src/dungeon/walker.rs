@@ -7,7 +7,6 @@ use super::room;
 
 pub struct Walker {
     position: position::Position,
-    dungeon: dungeon::Dungeon,
     steps_since_turn: i8,
     current_direction: position::Position,
 }
@@ -18,27 +17,28 @@ impl Walker {
         Walker {
             position            : position::Position::new(0, 0),
             steps_since_turn    : 0,
-            dungeon             : dungeon::Dungeon::new(),
             current_direction   : position::STOP,
         }
     }
 
 
-    pub fn generate(&mut self, steps: i32) {
+    pub fn generate(&mut self, steps: i32, dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
+        let mut new_dungeon = dungeon;
         self.current_direction = self.get_turn();
         for _ in 0..steps {
-            self.mine();
+            new_dungeon = self.mine(new_dungeon);
             self.step();
             self.turn();
         }
 
-        self.place_goal();
-
+        new_dungeon = self.place_goal(new_dungeon);
+        new_dungeon
     }
 
 
-    fn mine(&mut self) {
-       self.dungeon.set_room(&self.position, room::OPEN_ROOM); 
+    fn mine(&self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
+       dungeon.set_room(&self.position, room::OPEN_ROOM); 
+       dungeon
     }
 
 
@@ -61,14 +61,10 @@ impl Walker {
     }
     
 
-    fn place_goal(&mut self){
+    fn place_goal(&mut self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon{
         self.step(); 
-        self.dungeon.set_room(&self.position, room::GOAL_ROOM); 
+        dungeon.set_room(&self.position, room::GOAL_ROOM); 
+        dungeon
     }
-
-
-    pub fn print(&self) {
-       self.dungeon.print(&self.position); 
-    }
-
+    
 }

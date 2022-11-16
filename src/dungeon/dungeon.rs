@@ -24,11 +24,13 @@ impl Dungeon {
     }
         
 
-    pub fn print(&self, pos: &position::Position) {
+    pub fn print_with_player(&self, pos: &position::Position, sprite: &char) {
         for x in pos.x-20..pos.x+20 {
             for y in pos.y-20..pos.y+20 {
                 let index = position::Position::new(x, y);
-                if self.rooms.contains_key(&index) {
+                if &index == pos {
+                    print!("{} ", sprite)
+                }  else if self.rooms.contains_key(&index) {
                     let art = self.rooms[&index].art;
                     print!("{} ", art);
                 } else {
@@ -38,4 +40,10 @@ impl Dungeon {
             println!();
         }
     }
+
+
+    pub fn does_position_have_collision(&self, pos : &position::Position) -> bool {
+        !self.rooms.contains_key(pos)
+    }
+
 }
