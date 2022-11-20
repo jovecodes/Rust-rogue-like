@@ -7,3 +7,4 @@ pub mod unit;
 pub mod pathfinding;
 pub mod entity_manager;
 pub mod enemy;
+pub mod spawner;

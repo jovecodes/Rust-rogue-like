@@ -1,15 +1,16 @@
-use super::{player, dungeon, enemy};
+use super::{player, dungeon, enemy, spawner};
 use rand::seq::SliceRandom;
 
 pub struct EntityManager {
     player: player::Player,
     enemies: Vec<enemy::Enemy>,
+    spawner: spawner::Spawner,
 }
 
 
 impl EntityManager {
     pub fn new(player: player::Player) -> EntityManager {
-        EntityManager { player, enemies: Vec::new() }
+        EntityManager { player, enemies: Vec::new() , spawner: spawner::Spawner::new()}
     }
 
 
@@ -38,19 +39,15 @@ impl EntityManager {
                 break;
             }
             
-            for enemy in 0..self.enemies.len() {
-                if self.enemies.len() <= 0 { break; }
+            self.manage_enemies(&new_dungeon);
 
-                self.is_enemy_dead(enemy, &new_dungeon);
-
-                if self.enemies.len() <= 0 { break; }
-
-                self.enemies[enemy].do_action(&new_dungeon, &self.player);
+            if self.spawner.should_spawn() {
+                new_dungeon = self.spawn_enemy(new_dungeon)
             }
         }
         new_dungeon
     }
-
+     
 
     fn check_for_loss(&self) -> bool {
         for enemy in 0..self.enemies.len() {
@@ -59,6 +56,16 @@ impl EntityManager {
             }
         }
         return false;
+    }
+
+
+    fn manage_enemies(&mut self, dungeon: &dungeon::Dungeon) {
+        for enemy in 0..self.enemies.len() {
+            if self.enemies.len() <= 0 { break; }
+            self.is_enemy_dead(enemy, &dungeon);
+            if self.enemies.len() <= 0 { break; }
+            self.enemies[enemy].do_action(&dungeon, &self.player);
+        }
     }
 
 

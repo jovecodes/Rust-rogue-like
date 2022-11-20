@@ -30,11 +30,6 @@ impl Position {
     } 
 
 
-    pub fn plus(&self, pos: &Position) -> Position {
-        Position::new(self.x + pos.x, self.y + pos.y)
-    }
-
-
     pub fn become_direction(&mut self) {
         if self.x.abs() > self.y.abs() {
             self.y = 0;
