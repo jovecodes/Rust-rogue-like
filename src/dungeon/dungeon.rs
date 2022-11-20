@@ -6,17 +6,18 @@ use crate::dungeon::player;
 use super::enemy;
 
 const WINDOW_WIDTH: i32 = 20;
-const WINDOW_HEIGHT: i32 = 14;
+const WINDOW_HEIGHT: i32 = 13;
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct Dungeon {
     rooms: HashMap<position::Position, room::Room>,
+    pub valid: bool,
 }
 
 
 impl Dungeon {
     pub fn new() -> Dungeon { 
-        Dungeon {rooms: Self::make_empty_dungeon()}
+        Dungeon {rooms: Self::make_empty_dungeon(), valid: true}
     }
         
 
@@ -27,6 +28,11 @@ impl Dungeon {
 
     pub fn set_room(&mut self, pos: &position::Position, room: room::Room) {
         self.rooms.entry(*pos).and_modify(|index| *index = room).or_insert(room);
+    }
+
+
+    pub fn erase_room(&mut self, pos: &position::Position) {
+        self.rooms.remove(pos);
     }
         
 

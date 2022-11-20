@@ -22,16 +22,22 @@ impl EntityManager {
     }
         
 
-    pub fn manage(&mut self, dungeon : &dungeon::Dungeon) {
+    pub fn manage(&mut self, dungeon : dungeon::Dungeon) -> dungeon::Dungeon {
+        let mut new_dungeon = dungeon;
         loop {
-            dungeon.print(&self.player, &self.enemies);
-            if self.player.do_action(dungeon) == false {
+            new_dungeon.print(&self.player, &self.enemies);
+
+            new_dungeon = self.player.do_action(new_dungeon);
+
+            if new_dungeon.valid == false {
                 break;
             }
-            for enemy in 0..self.enemies.len() {
-                self.enemies[enemy].do_action(dungeon);
-            }
-        }
 
+            for enemy in 0..self.enemies.len() {
+                self.enemies[enemy].do_action(&new_dungeon, &self.player);
+            }
+
+        }
+        new_dungeon
     }
 }

@@ -10,7 +10,7 @@ pub struct Unit {
 
 impl Unit {
     pub fn new(position: position::Position, sprite: char) -> Unit {
-        Unit { position: position, sprite: sprite}
+        Unit { position, sprite}
     }
 
     pub fn walk(
