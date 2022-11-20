@@ -12,6 +12,7 @@ impl Position {
         Position { x, y }
     }
 
+
     pub fn set_with_int(&mut self, int : i32) -> Position {
         match int {
             0 => return LEFT,
@@ -22,10 +23,16 @@ impl Position {
         }
     }
 
+
     pub fn add(&mut self, pos: Position) {
         self.x += pos.x;
         self.y += pos.y;
     } 
+
+
+    pub fn plus(&self, pos: &Position) -> Position {
+        Position::new(self.x + pos.x, self.y + pos.y)
+    }
 
 
     pub fn become_direction(&mut self) {

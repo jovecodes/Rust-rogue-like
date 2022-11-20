@@ -11,7 +11,12 @@ impl Enemy {
        
 
     pub fn do_action(&mut self, dungeon: &dungeon::Dungeon, player: &player::Player) {
+        if self.unit.position == player.get_position() {
+            return; 
+        }
+
         let direction = pathfinding::pathfind(&self.unit.position, &player.unit.position);
-        self.unit.walk(position::Position::new(direction.x, direction.y), dungeon)
+
+        self.unit.walk(position::Position::new(direction.x, direction.y), dungeon);
     }
 }

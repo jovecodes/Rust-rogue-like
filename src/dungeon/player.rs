@@ -100,10 +100,7 @@ impl Player {
             &self.unit.position, 
             room::Room::new(
                 '.', 
-                position::Position::new(
-                    self.get_position().x, 
-                    self.get_position().y
-                )
+                self.get_position(), 
             )
         );
 
