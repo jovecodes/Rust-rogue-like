@@ -21,16 +21,18 @@ enum Action {
 pub struct Player {
     pub unit : unit::Unit,
     action: Action,
+    materials: i32,
 }
 
 
 impl Player {
     pub fn new(position: position::Position) -> Player {
-        Player { unit: unit::Unit::new(position, '@'), action: Action::Walk}
+        Player { unit: unit::Unit::new(position, '@'), action: Action::Walk, materials: 0}
     }
    
 
     pub fn do_action(&mut self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
+        println!("Materials: {}", self.materials);
         loop { 
             let action = Player::get_input();
             let mut valid_action = true;
@@ -84,9 +86,16 @@ impl Player {
         direction: position::Position, 
         dungeon: dungeon::Dungeon
     ) -> dungeon::Dungeon {
+
         let mut new_dungeon = dungeon;
+
         self.unit.position.x += direction.x;
         self.unit.position.y += direction.y;
+
+        if new_dungeon.does_position_have_collision(&self.unit.position) {
+            self.materials += 1;
+        }
+
         new_dungeon.set_room(
             &self.unit.position, 
             room::Room::new(
@@ -97,23 +106,33 @@ impl Player {
                 )
             )
         );
+
         self.action = Action::Walk;
         new_dungeon
     }
+
 
     fn build(
         &mut self, 
         direction: position::Position, 
         dungeon: dungeon::Dungeon
     ) -> dungeon::Dungeon {
-        let mut new_dungeon = dungeon;
-        new_dungeon.erase_room(
-            &position::Position::new(
-                self.get_position().x + direction.x,
-                self.get_position().y + direction.y,
-            )
-        );
         self.action = Action::Walk;
+
+        let build_pos = &position::Position::new(
+            self.get_position().x + direction.x,
+            self.get_position().y + direction.y,
+        );
+        
+        if dungeon.does_position_have_collision(&build_pos) == false {
+            if self.materials <= 0 {
+                return dungeon;
+            }
+            self.materials -= 1;
+        }
+        let mut new_dungeon = dungeon;
+        new_dungeon.erase_room(build_pos);
+
         new_dungeon
     }
 

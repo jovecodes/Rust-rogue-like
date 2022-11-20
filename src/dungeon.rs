@@ -4,5 +4,6 @@ pub mod player;
 pub mod room;
 pub mod walker; 
 pub mod unit;
+pub mod pathfinding;
 pub mod entity_manager;
 pub mod enemy;
