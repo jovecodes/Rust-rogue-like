@@ -2,6 +2,7 @@ use crate::dungeon::dungeon;
 use crate::dungeon::entity_manager;
 use text_io::read;
 use serde_derive::{Serialize, Deserialize};
+use magic_crypt::MagicCryptTrait;
 
 use super::room::Room;
 use super::position::Position;
@@ -33,7 +34,7 @@ pub struct Loader {
 impl Saver {
     pub fn save(
         dungeon: dungeon::Dungeon, 
-        manager: entity_manager::EntityManager
+        manager: entity_manager::EntityManager,
     ) {
         let saver = Saver {   
             dungeon_map_x: dungeon.get_map_x(), 
@@ -45,14 +46,20 @@ impl Saver {
             enemy_positions_y: get_enemy_positions_y(&manager),
             turns_till_spawn: manager.spawner.turns_till_spawn,
         };
+        let mcrypt = new_magic_crypt!("magickey", 256);
         let serialized = serde_json::to_string(&saver).unwrap();
 
-        println!("Game save: {}", serialized);
+        let encrypted_save = mcrypt.encrypt_str_to_base64(serialized);
+
+        println!("Game save: {}", encrypted_save);
     }
 
     pub fn load() -> Loader {
+        let mcrypt = new_magic_crypt!("magickey", 256);
+
         let input : String = read!();
-        let str_input : &str = &input[..];
+        let decypted_save = mcrypt.decrypt_base64_to_string(&input).unwrap();
+        let str_input : &str = &decypted_save[..];
         // Convert the JSON string back to a Point.
         let deserialized: Saver = serde_json::from_str(str_input).unwrap();
         Loader::load(deserialized)
