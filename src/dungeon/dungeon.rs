@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+
 use crate::dungeon::position;
 use crate::dungeon::room;
 use crate::dungeon::player;
@@ -8,7 +9,6 @@ use super::enemy;
 const WINDOW_WIDTH: i32 = 20;
 const WINDOW_HEIGHT: i32 = 13;
 
-#[derive(Clone, Eq, PartialEq)]
 pub struct Dungeon {
     rooms: HashMap<position::Position, room::Room>,
     pub valid: bool,
@@ -25,6 +25,12 @@ impl Dungeon {
         return HashMap::new();
     }
 
+
+    pub fn load_map(&mut self, map : Vec<room::Room>) {
+        for room in map {
+            self.rooms.insert(room.position.clone(), room);
+        }
+    }
 
     pub fn set_room(&mut self, pos: &position::Position, room: room::Room) {
         self.rooms.entry(*pos).and_modify(|index| *index = room).or_insert(room);
@@ -68,8 +74,28 @@ impl Dungeon {
         !self.rooms.contains_key(pos)
     }
 
+
     pub fn get_empty_rooms(&self) -> Vec<room::Room> {
         self.rooms.values().cloned().collect::<Vec<room::Room>>()
+    }
+
+
+    pub fn get_map_x(&self) -> Vec<i32> {
+
+        let mut x = Vec::new();
+        for (_, position) in &self.rooms {
+            x.append(&mut vec![position.position.x]);
+        }
+        x
+    }
+
+
+    pub fn get_map_y(&self) -> Vec<i32> {
+        let mut y = Vec::new();
+        for (_, position) in &self.rooms {
+            y.append(&mut vec![position.position.y]);
+        }
+        y
     }
 
 }

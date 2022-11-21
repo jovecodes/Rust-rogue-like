@@ -1,10 +1,14 @@
+
+use serde_derive::{Serialize, Deserialize};
+
 pub const LEFT  : Position = Position {x:-1, y: 0};
 pub const RIGHT : Position = Position {x: 1, y: 0};
 pub const DOWN  : Position = Position {x: 0, y: 1};
 pub const UP    : Position = Position {x: 0, y:-1};
 pub const STOP  : Position = Position {x: 0, y: 0};
 
-#[derive(Clone, Copy, Hash, Eq, PartialEq)]
+
+#[derive(Clone, Copy, Hash, Eq, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Position {pub x: i32,pub y: i32}
 
 impl Position {

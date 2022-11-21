@@ -1,16 +1,17 @@
-use super::{player, dungeon, enemy, spawner};
+use super::{player, dungeon, enemy, spawner, position};
 use rand::seq::SliceRandom;
 
+
 pub struct EntityManager {
-    player: player::Player,
-    enemies: Vec<enemy::Enemy>,
-    spawner: spawner::Spawner,
+    pub player: player::Player,
+    pub enemies: Vec<enemy::Enemy>,
+    pub spawner: spawner::Spawner,
 }
 
 
 impl EntityManager {
-    pub fn new(player: player::Player) -> EntityManager {
-        EntityManager { player, enemies: Vec::new() , spawner: spawner::Spawner::new()}
+    pub fn new(player: player::Player, enemies: Vec<enemy::Enemy>, turns_till_spawn: i32) -> EntityManager {
+        EntityManager { player, enemies, spawner: spawner::Spawner::new(turns_till_spawn)}
     }
 
 
@@ -75,5 +76,15 @@ impl EntityManager {
         ) {
             self.enemies.remove(enemy);
         }
+    }
+
+    pub fn get_enemy_positions(&self) -> Vec<&position::Position> {
+        let mut positions = Vec::new();
+
+        for enemy in 0..self.enemies.len() {
+            positions.append(&mut vec![&self.enemies[enemy].unit.position]);
+        }
+
+        positions
     }
 }

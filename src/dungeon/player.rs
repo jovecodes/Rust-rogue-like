@@ -4,6 +4,7 @@ use crate::dungeon::position;
 use crate::dungeon::unit;
 use crate::dungeon::room;
 
+
 const MOVE_UP : char = 'w';
 const MOVE_LEFT : char = 'a';
 const MOVE_DOWN : char = 's';
@@ -26,8 +27,8 @@ pub struct Player {
 
 
 impl Player {
-    pub fn new(position: position::Position) -> Player {
-        Player { unit: unit::Unit::new(position, '@'), action: Action::Walk, materials: 0}
+    pub fn new(position: position::Position, materials: i32) -> Player {
+        Player { unit: unit::Unit::new(position, '@'), action: Action::Walk, materials}
     }
    
 
@@ -62,7 +63,7 @@ impl Player {
             let action = byte.unwrap() as char;
             return action;
         }
-        return 'h'
+        return 'x'
     }
 
 
@@ -136,5 +137,9 @@ impl Player {
     
     pub fn get_position(&self) -> position::Position {
         self.unit.position
+    }
+
+    pub fn get_materials(&self) -> i32 {
+        self.materials
     }
 }

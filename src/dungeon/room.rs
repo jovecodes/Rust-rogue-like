@@ -1,7 +1,9 @@
+use serde_derive::{Serialize, Deserialize};
+
 use crate::dungeon::position;
 
 
-#[derive(Clone, Copy, PartialEq, Hash, Eq)]
+#[derive(Clone, Copy, PartialEq, Hash, Eq, Debug, Deserialize, Serialize)]
 pub struct Room {
     pub art: char,
     pub position: position::Position

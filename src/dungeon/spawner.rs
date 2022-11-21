@@ -1,11 +1,14 @@
 
+use serde_derive::{Serialize, Deserialize};
+ 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Spawner {
-    turns_till_spawn: i32,
+    pub turns_till_spawn: i32,
 }
 
 impl Spawner {
-    pub fn new() -> Spawner {
-        Spawner { turns_till_spawn: 10 }
+    pub fn new(turns_till_spawn: i32) -> Spawner {
+        Spawner { turns_till_spawn }
     }
 
 
