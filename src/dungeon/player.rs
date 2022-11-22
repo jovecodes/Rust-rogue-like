@@ -1,7 +1,6 @@
 use std::io::{self,Read};
 use crate::dungeon::dungeon;
 use crate::dungeon::position;
-use crate::dungeon::unit;
 use crate::dungeon::room;
 
 
@@ -20,15 +19,16 @@ enum Action {
 }
 
 pub struct Player {
-    pub unit : unit::Unit,
     action: Action,
     materials: i32,
+    position: position::Position,
+    pub sprite: char,
 }
 
 
 impl Player {
     pub fn new(position: position::Position, materials: i32) -> Player {
-        Player { unit: unit::Unit::new(position, '@'), action: Action::Walk, materials}
+        Player { position, sprite: '@', action: Action::Walk, materials}
     }
    
 
@@ -74,11 +74,25 @@ impl Player {
     ) -> dungeon::Dungeon {
         let mut new_dungeon = dungeon;
         match self.action {
-            Action::Walk => self.unit.walk(direction, &new_dungeon),
+            Action::Walk => self.walk(direction, &new_dungeon),
             Action::Mine => new_dungeon = self.mine(direction, new_dungeon),
             Action::Build => new_dungeon = self.build(direction, new_dungeon),
         }
         new_dungeon
+    }
+
+
+    fn walk(
+        &mut self, direction: position::Position, 
+        dungeon: &dungeon::Dungeon
+    ) {
+       let future_position = position::Position::new(
+           self.position.x + direction.x,
+           self.position.y + direction.y
+        );
+       if dungeon.does_position_have_collision(&future_position) == false {
+            self.position.add(direction);
+       }
     }
 
 
@@ -90,18 +104,18 @@ impl Player {
 
         let mut new_dungeon = dungeon;
 
-        self.unit.position.x += direction.x;
-        self.unit.position.y += direction.y;
+        self.position.x += direction.x;
+        self.position.y += direction.y;
 
-        if new_dungeon.does_position_have_collision(&self.unit.position) {
+        if new_dungeon.does_position_have_collision(&self.position) {
             self.materials += 1;
         }
 
         new_dungeon.set_room(
-            &self.unit.position, 
+            &self.position, 
             room::Room::new(
                 '.', 
-                self.get_position(), 
+                self.position, 
             )
         );
 
@@ -133,10 +147,11 @@ impl Player {
 
         new_dungeon
     }
+    
 
     
-    pub fn get_position(&self) -> position::Position {
-        self.unit.position
+    pub fn get_position(&self) -> &position::Position {
+        &self.position
     }
 
     pub fn get_materials(&self) -> i32 {

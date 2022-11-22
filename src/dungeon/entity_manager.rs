@@ -52,7 +52,7 @@ impl EntityManager {
 
     fn check_for_loss(&self) -> bool {
         for enemy in 0..self.enemies.len() {
-            if self.enemies[enemy].unit.position == self.player.get_position() {
+            if self.enemies[enemy].get_position() == self.player.get_position() {
                 return true;
             }
         }
@@ -72,7 +72,7 @@ impl EntityManager {
 
     fn is_enemy_dead(&mut self, enemy: usize, new_dungeon: &dungeon::Dungeon) {
         if new_dungeon.does_position_have_collision(
-            &self.enemies[enemy].unit.position
+            self.enemies[enemy].get_position()
         ) {
             self.enemies.remove(enemy);
         }
@@ -82,7 +82,7 @@ impl EntityManager {
         let mut positions = Vec::new();
 
         for enemy in 0..self.enemies.len() {
-            positions.append(&mut vec![&self.enemies[enemy].unit.position]);
+            positions.append(&mut vec![self.enemies[enemy].get_position()]);
         }
 
         positions

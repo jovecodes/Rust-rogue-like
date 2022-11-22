@@ -53,13 +53,13 @@ impl Dungeon {
                     art = self.rooms[&index].art;
                 }
 
-                if player.get_position() == index {
-                    art = player.unit.sprite;
+                if player.get_position() == &index {
+                    art = player.sprite;
                 }
 
                 for enemy in 0..enemies.len() {
-                    if enemies[enemy].unit.position == index {
-                        art = enemies[enemy].unit.sprite;
+                    if enemies[enemy].get_position() == &index {
+                        art = enemies[enemy].sprite;
                     }
                 }
 
