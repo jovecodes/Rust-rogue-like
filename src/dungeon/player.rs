@@ -22,7 +22,7 @@ pub struct Player {
     action: Action,
     materials: i32,
     position: position::Position,
-    pub sprite: char,
+    sprite: char,
 }
 
 
@@ -78,6 +78,7 @@ impl Player {
             Action::Mine => new_dungeon = self.mine(direction, new_dungeon),
             Action::Build => new_dungeon = self.build(direction, new_dungeon),
         }
+        self.action = Action::Walk;
         new_dungeon
     }
 
@@ -86,10 +87,7 @@ impl Player {
         &mut self, direction: position::Position, 
         dungeon: &dungeon::Dungeon
     ) {
-       let future_position = position::Position::new(
-           self.position.x + direction.x,
-           self.position.y + direction.y
-        );
+       let future_position = self.position.plus(&direction);
        if dungeon.does_position_have_collision(&future_position) == false {
             self.position.add(direction);
        }
@@ -116,10 +114,10 @@ impl Player {
             room::Room::new(
                 '.', 
                 self.position, 
+                0
             )
         );
 
-        self.action = Action::Walk;
         new_dungeon
     }
 
@@ -129,7 +127,6 @@ impl Player {
         direction: position::Position, 
         dungeon: dungeon::Dungeon
     ) -> dungeon::Dungeon {
-        self.action = Action::Walk;
 
         let build_pos = &position::Position::new(
             self.get_position().x + direction.x,
@@ -157,4 +154,9 @@ impl Player {
     pub fn get_materials(&self) -> i32 {
         self.materials
     }
+
+    pub fn get_sprite(&self) -> char {
+        self.sprite
+    }
+
 }

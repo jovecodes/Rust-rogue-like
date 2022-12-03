@@ -1,6 +1,6 @@
 use super::{position, dungeon, player, pathfinding};
 
-
+#[derive(Clone, Copy)]
 pub struct Enemy {
     pub position: position::Position,
     pub sprite: char,
@@ -15,10 +15,7 @@ impl Enemy {
         &mut self, direction: position::Position, 
         dungeon: &dungeon::Dungeon
     ) {
-       let future_position = position::Position::new(
-           self.position.x + direction.x,
-           self.position.y + direction.y
-        );
+       let future_position = self.position.plus(&direction);
        if dungeon.does_position_have_collision(&future_position) == false {
             self.position.add(direction);
        }

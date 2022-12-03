@@ -112,7 +112,7 @@ impl Loader {
         }
 
         for pos in dungeon_map_pos {
-            map.append(&mut vec![Room::new('.', pos)])
+            map.append(&mut vec![Room::new('.', pos, 0)])
         }
         dungeon.load_map(map);
         dungeon

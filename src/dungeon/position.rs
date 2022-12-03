@@ -43,6 +43,14 @@ impl Position {
             self.y /= self.y.abs();
         }
     }
+
+
+    pub fn plus(&self, pos: &Position) -> Position {
+        Position::new(
+            self.x + pos.x,
+            self.y + pos.y
+        )
+    }
 }
 
 

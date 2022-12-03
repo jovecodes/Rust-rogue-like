@@ -1,6 +1,8 @@
-
 use serde_derive::{Serialize, Deserialize};
- 
+
+const SPAWN_SPEED : i32 = 15;
+
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Spawner {
     pub turns_till_spawn: i32,
@@ -14,7 +16,7 @@ impl Spawner {
 
     pub fn should_spawn(&mut self) -> bool {
         if self.turns_till_spawn <= 0 {
-            self.turns_till_spawn = 10;
+            self.turns_till_spawn = SPAWN_SPEED;
             println!("turns till spawn: {}", self.turns_till_spawn);
             return true;
         } else {

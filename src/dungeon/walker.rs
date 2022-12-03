@@ -37,7 +37,7 @@ impl Walker {
 
 
     fn mine(&self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
-       dungeon.set_room(&self.position, room::Room::new('.', self.position)); 
+       dungeon.set_room(&self.position, room::Room::new('.', self.position, 0)); 
        dungeon
     }
 
@@ -63,7 +63,7 @@ impl Walker {
 
     fn place_goal(&mut self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon{
         self.step(); 
-        dungeon.set_room(&self.position, room::Room::new('G', self.position)); 
+        dungeon.set_room(&self.position, room::Room::new('G', self.position, 0)); 
         dungeon
     }
     

@@ -54,7 +54,7 @@ impl Dungeon {
                 }
 
                 if player.get_position() == &index {
-                    art = player.sprite;
+                    art = player.get_sprite();
                 }
 
                 for enemy in 0..enemies.len() {

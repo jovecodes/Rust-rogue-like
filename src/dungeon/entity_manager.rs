@@ -61,22 +61,27 @@ impl EntityManager {
 
 
     fn manage_enemies(&mut self, dungeon: &dungeon::Dungeon) {
+        let mut new_enemies = self.enemies.clone();
         for enemy in 0..self.enemies.len() {
-            if self.enemies.len() <= 0 { break; }
-            self.is_enemy_dead(enemy, &dungeon);
-            if self.enemies.len() <= 0 { break; }
-            self.enemies[enemy].do_action(&dungeon, &self.player);
+            if self.is_enemy_dead(enemy, dungeon) == true {
+                new_enemies.remove(enemy);
+            }
         }
+        for i in 0..new_enemies.len() {
+            new_enemies[i].do_action(&dungeon, &self.player);
+        }
+        self.enemies = new_enemies;
     }
 
 
-    fn is_enemy_dead(&mut self, enemy: usize, new_dungeon: &dungeon::Dungeon) {
-        if new_dungeon.does_position_have_collision(
-            self.enemies[enemy].get_position()
-        ) {
-            self.enemies.remove(enemy);
-        }
+    fn is_enemy_dead(
+        &mut self, 
+        enemy: usize, 
+        new_dungeon: &dungeon::Dungeon
+    ) -> bool {
+        new_dungeon.does_position_have_collision(self.enemies[enemy].get_position())
     }
+
 
     pub fn get_enemy_positions(&self) -> Vec<&position::Position> {
         let mut positions = Vec::new();

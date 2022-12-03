@@ -11,7 +11,6 @@ pub mod enemy;
 pub mod spawner;
 pub mod saver_loader;
 
-
 pub fn play() {
     println!("use save? <y/n>");
     if get_input() == 'y' {
