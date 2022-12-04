@@ -1,15 +1,12 @@
 use std::io::{self,Read};
 
-pub mod position;
+use crate::saver_loader;
+use crate::entities::entity_manager;
+use crate::entities::position;
+use crate::entities::player;
 pub mod dungeon;
-pub mod player;
 pub mod room;
 pub mod walker; 
-pub mod pathfinding;
-pub mod entity_manager;
-pub mod enemy;
-pub mod spawner;
-pub mod saver_loader;
 
 pub fn play() {
     println!("use save? <y/n>");

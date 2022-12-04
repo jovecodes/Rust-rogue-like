@@ -1,2 +1,2 @@
 pub mod light;
-pub mod lighting;
+pub mod lighting_manager;

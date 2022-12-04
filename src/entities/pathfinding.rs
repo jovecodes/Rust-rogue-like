@@ -1,4 +1,4 @@
-use crate::dungeon::position::Position;
+use crate::entities::position::Position;
 
 
 pub fn pathfind(

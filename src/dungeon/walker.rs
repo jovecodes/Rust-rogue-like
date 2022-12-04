@@ -1,6 +1,6 @@
 use crate::dungeon::dungeon;
 use rand::Rng;
-use crate::dungeon::position;
+use crate::entities::position;
 
 use super::room;
 

@@ -1,7 +1,10 @@
 use std::io::{self,Read};
 use crate::dungeon::dungeon;
-use crate::dungeon::position;
+use crate::entities::position;
 use crate::dungeon::room;
+use crate::lighting::light::Light;
+
+const PLAYER_LIGHT_BRIGHTNESS: i32 = 3;
 
 
 const MOVE_UP : char = 'w';
@@ -9,6 +12,7 @@ const MOVE_LEFT : char = 'a';
 const MOVE_DOWN : char = 's';
 const MOVE_RIGHT : char = 'd';
 const MINE : char = 'm';
+const PLACE_LIGHT : char = 'l';
 const BUILD : char = 'b';
 const QUIT : char = 'q';
 
@@ -16,6 +20,7 @@ enum Action {
     Walk,
     Build,
     Mine,
+    PlaceLight,
 }
 
 pub struct Player {
@@ -23,12 +28,19 @@ pub struct Player {
     materials: i32,
     position: position::Position,
     sprite: char,
+    pub light: Light
 }
 
 
 impl Player {
     pub fn new(position: position::Position, materials: i32) -> Player {
-        Player { position, sprite: '@', action: Action::Walk, materials}
+        Player { 
+            position, 
+            sprite: '@', 
+            action: Action::Walk, 
+            materials,
+            light: Light::new(PLAYER_LIGHT_BRIGHTNESS, position),
+        }
     }
    
 
@@ -44,6 +56,7 @@ impl Player {
                 MOVE_RIGHT => dungeon = self.get_action(position::DOWN, dungeon),
                 MINE => self.action = Action::Mine,
                 BUILD => self.action = Action::Build,
+                PLACE_LIGHT => self.action = Action::PlaceLight,
                 QUIT => {
                     dungeon.valid = false;
                     return dungeon;
@@ -77,8 +90,10 @@ impl Player {
             Action::Walk => self.walk(direction, &new_dungeon),
             Action::Mine => new_dungeon = self.mine(direction, new_dungeon),
             Action::Build => new_dungeon = self.build(direction, new_dungeon),
+            Action::PlaceLight => new_dungeon = self.place_light(direction, new_dungeon),
         }
         self.action = Action::Walk;
+        self.light.set_pos(self.position);
         new_dungeon
     }
 
@@ -102,8 +117,7 @@ impl Player {
 
         let mut new_dungeon = dungeon;
 
-        self.position.x += direction.x;
-        self.position.y += direction.y;
+        self.position.add(direction);
 
         if new_dungeon.does_position_have_collision(&self.position) {
             self.materials += 1;
@@ -128,10 +142,7 @@ impl Player {
         dungeon: dungeon::Dungeon
     ) -> dungeon::Dungeon {
 
-        let build_pos = &position::Position::new(
-            self.get_position().x + direction.x,
-            self.get_position().y + direction.y,
-        );
+        let build_pos = &self.position.plus(&direction);
         
         if dungeon.does_position_have_collision(&build_pos) == false {
             if self.materials <= 0 {
@@ -144,9 +155,19 @@ impl Player {
 
         new_dungeon
     }
-    
+     
+    fn place_light(
+        &mut self, 
+        direction: position::Position,
+        dungeon: dungeon::Dungeon
+    ) -> dungeon::Dungeon {
+        let mut new_dungeon = dungeon;
+        new_dungeon.lights.push(Light::new(10, self.position.plus(&direction)));
+        println!("{:?}", new_dungeon.lights);
+        new_dungeon
+    }
+     
 
-    
     pub fn get_position(&self) -> &position::Position {
         &self.position
     }
@@ -157,6 +178,10 @@ impl Player {
 
     pub fn get_sprite(&self) -> char {
         self.sprite
+    }
+
+    pub fn get_light(&self) -> Light {
+        Light::new(self.light.get_brightness(), self.position)
     }
 
 }

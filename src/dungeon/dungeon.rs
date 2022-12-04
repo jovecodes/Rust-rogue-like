@@ -1,23 +1,25 @@
 use std::collections::HashMap;
 
-use crate::dungeon::position;
+use crate::entities::position;
 use crate::dungeon::room;
-use crate::dungeon::player;
-
-use super::enemy;
+use crate::entities::player;
+use crate::entities::enemy;
+use crate::lighting::light::Light;
 
 const WINDOW_WIDTH: i32 = 20;
 const WINDOW_HEIGHT: i32 = 13;
+const UNSEEN_ROOM_ART: char = '#';
 
 pub struct Dungeon {
-    rooms: HashMap<position::Position, room::Room>,
+    pub rooms: HashMap<position::Position, room::Room>,
     pub valid: bool,
+    pub lights: Vec<Light>,
 }
 
 
 impl Dungeon {
     pub fn new() -> Dungeon { 
-        Dungeon {rooms: Self::make_empty_dungeon(), valid: true}
+        Dungeon {rooms: Self::make_empty_dungeon(), valid: true, lights: Vec::new()}
     }
         
 
@@ -47,10 +49,16 @@ impl Dungeon {
         for x in pos.x-WINDOW_HEIGHT..pos.x+WINDOW_HEIGHT {
             for y in pos.y-WINDOW_WIDTH..pos.y+WINDOW_WIDTH {
                 let index = position::Position::new(x, y);
-                let mut art = '#';
+                let mut art = UNSEEN_ROOM_ART;
                 
                 if self.rooms.contains_key(&index) {
                     art = self.rooms[&index].art;
+                }
+
+                for i in 0..self.lights.len() {
+                    if self.lights[i].get_position() == &index {
+                        art = 'i';
+                    }
                 }
 
                 if player.get_position() == &index {
@@ -60,6 +68,12 @@ impl Dungeon {
                 for enemy in 0..enemies.len() {
                     if enemies[enemy].get_position() == &index {
                         art = enemies[enemy].sprite;
+                    }
+                }
+
+                if self.rooms.contains_key(&index) {
+                    if self.rooms[&index].is_lighted == false {
+                        art = UNSEEN_ROOM_ART;
                     }
                 }
 

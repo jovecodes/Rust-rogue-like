@@ -1,15 +1,15 @@
 use crate::dungeon::dungeon;
-use crate::dungeon::entity_manager;
+use crate::entities::entity_manager;
 use text_io::read;
 use serde_derive::{Serialize, Deserialize};
 use magic_crypt::MagicCryptTrait;
 
-use super::room::Room;
-use super::position::Position;
-use super::dungeon::Dungeon;
-use super::entity_manager::EntityManager;
-use super::player::Player;
-use super::enemy::Enemy;
+use crate::dungeon::room::Room;
+use crate::entities::position::Position;
+use crate::dungeon::dungeon::Dungeon;
+use crate::entities::entity_manager::EntityManager;
+use crate::entities::player::Player;
+use super::entities::enemy::Enemy;
 
 
 #[derive(Serialize, Deserialize, Debug)]

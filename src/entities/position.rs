@@ -51,6 +51,13 @@ impl Position {
             self.y + pos.y
         )
     }
+
+    pub fn distance_to(&self, pos: &Position) -> f32 {
+        let x = (self.x - pos.x).pow(2);
+        let y = (self.y - pos.y).pow(2);
+        let total = (x + y) as f32;
+        total.sqrt()
+    }
 }
 
 

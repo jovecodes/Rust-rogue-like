@@ -1,5 +1,8 @@
 #[macro_use] extern crate magic_crypt;
 mod dungeon;
+mod lighting;
+mod entities;
+mod saver_loader;
 
 fn main() {
     dungeon::play();
