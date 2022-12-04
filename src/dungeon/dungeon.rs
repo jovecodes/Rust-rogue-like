@@ -42,6 +42,11 @@ impl Dungeon {
     pub fn erase_room(&mut self, pos: &position::Position) {
         self.rooms.remove(pos);
     }
+
+
+    pub fn set_room_as_empty(&mut self, pos: position::Position) {
+        self.set_room(&pos, room::Room::new('.', pos, 0))
+    }
         
 
     pub fn print(&self, player: &player::Player, enemies: &Vec<enemy::Enemy>) {

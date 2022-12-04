@@ -22,23 +22,18 @@ impl Walker {
     }
 
 
-    pub fn generate(&mut self, steps: i32, dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
-        let mut new_dungeon = dungeon;
+    pub fn generate(&mut self, steps: i32, dungeon: &mut dungeon::Dungeon) {
         self.current_direction = self.get_turn();
         for _ in 0..steps {
-            new_dungeon = self.mine(new_dungeon);
+            self.mine(dungeon);
             self.step();
             self.turn();
         }
-
-        new_dungeon = self.place_goal(new_dungeon);
-        new_dungeon
     }
 
 
-    fn mine(&self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
+    fn mine(&self, dungeon: &mut dungeon::Dungeon) {
        dungeon.set_room(&self.position, room::Room::new('.', self.position, 0)); 
-       dungeon
     }
 
 
@@ -59,12 +54,4 @@ impl Walker {
         let mut rng = rand::thread_rng();
         return self.current_direction.set_with_int(rng.gen_range(0..4));
     }
-    
-
-    fn place_goal(&mut self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon{
-        self.step(); 
-        dungeon.set_room(&self.position, room::Room::new('G', self.position, 0)); 
-        dungeon
-    }
-    
 }

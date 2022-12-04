@@ -34,7 +34,7 @@ fn play_with_save() {
 
     let mut dungeon = loader.dungeon;
     let mut entity_manager = loader.manager;
-    dungeon = entity_manager.manage(dungeon);
+    entity_manager.manage(&mut dungeon);
 
     saver_loader::Saver::save(dungeon, entity_manager);
 }
@@ -45,9 +45,10 @@ fn play_with_new_game() {
     let mut walker = walker::Walker::new();
     let player = player::Player::new(position::STOP, 0);
     let mut entity_manager = entity_manager::EntityManager::new(player, Vec::new(), 10);
-    dungeon = walker.generate(300, dungeon);
-    dungeon = entity_manager.spawn_enemy(dungeon);
-    dungeon = entity_manager.manage(dungeon);
+
+    walker.generate(300, &mut dungeon);
+    entity_manager.spawn_enemy(&mut dungeon);
+    entity_manager.manage(&mut dungeon);
 
     saver_loader::Saver::save(dungeon, entity_manager);
 }

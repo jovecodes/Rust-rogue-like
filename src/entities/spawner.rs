@@ -8,6 +8,7 @@ pub struct Spawner {
     pub turns_till_spawn: i32,
 }
 
+
 impl Spawner {
     pub fn new(turns_till_spawn: i32) -> Spawner {
         Spawner { turns_till_spawn }

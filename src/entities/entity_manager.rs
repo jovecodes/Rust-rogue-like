@@ -23,57 +23,56 @@ impl EntityManager {
         }
     }
 
+    
+    pub fn manage(&mut self, dungeon : &mut dungeon::Dungeon) {
+        loop {
+            self.set_lighting(dungeon);
+            dungeon.print(&self.player, &self.enemies);
 
-    pub fn spawn_enemy(&mut self, dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
-        let positions = dungeon.get_empty_rooms();
-        let mut valid_positions : Vec<room::Room> = Vec::new();
-        for i in 0..positions.len() {
-            if positions[i].is_lighted == false {
-                valid_positions.push(positions[i]);
+            if self.check_for_loss() { break; }
+
+            self.player.do_action(dungeon);
+
+            if dungeon.valid == false {
+                break;
+            }
+            
+            self.manage_enemies(&dungeon);
+
+            if self.spawner.should_spawn() {
+                self.spawn_enemy(dungeon);
             }
         }
+    }
 
+
+    pub fn spawn_enemy(&mut self, dungeon: &mut dungeon::Dungeon) {
+        let valid_positions = EntityManager::get_spawnable_rooms(dungeon);
         if valid_positions.is_empty() == true {
-            return dungeon;
+            return;
         }
         let room = valid_positions.choose(&mut rand::thread_rng()).unwrap();
         let mut enemy = vec![enemy::Enemy::new(room.position)];
         self.enemies.append(&mut enemy);
-        dungeon
     }
-        
 
-    pub fn manage(&mut self, dungeon : dungeon::Dungeon) -> dungeon::Dungeon {
-        let mut new_dungeon = dungeon;
-        loop {
-            let lights = self.get_lights(&mut new_dungeon);
-            new_dungeon.rooms = lighting_manager::manage_light(&lights, &new_dungeon);
-            new_dungeon.print(&self.player, &self.enemies);
 
-            if self.check_for_loss() {
-                println!("You Lose!");
-                break;
-            }
-
-            new_dungeon = self.player.do_action(new_dungeon);
-
-            if new_dungeon.valid == false {
-                break;
-            }
-            
-            self.manage_enemies(&new_dungeon);
-
-            if self.spawner.should_spawn() {
-                new_dungeon = self.spawn_enemy(new_dungeon)
+    fn get_spawnable_rooms(dungeon: &mut dungeon::Dungeon) -> Vec<room::Room>{
+        let rooms = dungeon.get_empty_rooms();
+        let mut valid_rooms : Vec<room::Room> = Vec::new();
+        for i in 0..rooms.len() {
+            if rooms[i].is_lighted == false {
+                valid_rooms.push(rooms[i]);
             }
         }
-        new_dungeon
+        valid_rooms
     }
-     
+        
 
     fn check_for_loss(&self) -> bool {
         for enemy in 0..self.enemies.len() {
             if self.enemies[enemy].get_position() == self.player.get_position() {
+                println!("You Lose!");
                 return true;
             }
         }
@@ -104,9 +103,9 @@ impl EntityManager {
     fn is_enemy_dead(
         &mut self, 
         enemy: usize, 
-        new_dungeon: &dungeon::Dungeon
+        dungeon: &dungeon::Dungeon
     ) -> bool {
-        new_dungeon.does_position_have_collision(self.enemies[enemy].get_position())
+        dungeon.does_position_have_collision(self.enemies[enemy].get_position())
     }
 
 
@@ -118,6 +117,12 @@ impl EntityManager {
         }
 
         positions
+    }
+
+
+    fn set_lighting(&mut self, dungeon: &mut dungeon::Dungeon) {
+        let lights = self.get_lights(dungeon);
+        dungeon.rooms = lighting_manager::manage_light(&lights, &dungeon);
     }
 
 

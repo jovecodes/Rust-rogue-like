@@ -1,7 +1,6 @@
 use std::io::{self,Read};
 use crate::dungeon::dungeon;
 use crate::entities::position;
-use crate::dungeon::room;
 use crate::lighting::light::Light;
 
 const PLAYER_LIGHT_BRIGHTNESS: i32 = 3;
@@ -44,22 +43,22 @@ impl Player {
     }
    
 
-    pub fn do_action(&mut self, mut dungeon: dungeon::Dungeon) -> dungeon::Dungeon {
+    pub fn do_action(&mut self, mut dungeon: &mut dungeon::Dungeon) {
         println!("Materials: {}", self.materials);
         loop { 
             let action = Player::get_input();
             let mut valid_action = true;
             match action {
-                MOVE_UP => dungeon = self.get_action(position::LEFT, dungeon),
-                MOVE_LEFT => dungeon = self.get_action(position::UP, dungeon),
-                MOVE_DOWN => dungeon = self.get_action(position::RIGHT, dungeon),
-                MOVE_RIGHT => dungeon = self.get_action(position::DOWN, dungeon),
+                MOVE_UP => self.get_action(position::LEFT, dungeon),
+                MOVE_LEFT => self.get_action(position::UP, dungeon),
+                MOVE_DOWN => self.get_action(position::RIGHT, dungeon),
+                MOVE_RIGHT => self.get_action(position::DOWN, dungeon),
                 MINE => self.action = Action::Mine,
                 BUILD => self.action = Action::Build,
                 PLACE_LIGHT => self.action = Action::PlaceLight,
                 QUIT => {
                     dungeon.valid = false;
-                    return dungeon;
+                    return;
                 },
                 _ => valid_action = false,
             }
@@ -67,7 +66,6 @@ impl Player {
                 break;
             }
         }
-        return dungeon;
     }
 
     
@@ -83,18 +81,16 @@ impl Player {
     fn get_action(
         &mut self, 
         direction: position::Position, 
-        dungeon: dungeon::Dungeon
-    ) -> dungeon::Dungeon {
-        let mut new_dungeon = dungeon;
+        dungeon: &mut dungeon::Dungeon
+    ) {
         match self.action {
-            Action::Walk => self.walk(direction, &new_dungeon),
-            Action::Mine => new_dungeon = self.mine(direction, new_dungeon),
-            Action::Build => new_dungeon = self.build(direction, new_dungeon),
-            Action::PlaceLight => new_dungeon = self.place_light(direction, new_dungeon),
+            Action::Walk => self.walk(direction, &dungeon),
+            Action::Mine => self.mine(direction, dungeon),
+            Action::Build => self.build(direction, dungeon),
+            Action::PlaceLight => self.place_light(direction, dungeon),
         }
         self.action = Action::Walk;
         self.light.set_pos(self.position);
-        new_dungeon
     }
 
 
@@ -112,59 +108,44 @@ impl Player {
     fn mine(
         &mut self, 
         direction: position::Position, 
-        dungeon: dungeon::Dungeon
-    ) -> dungeon::Dungeon {
-
-        let mut new_dungeon = dungeon;
-
+        dungeon: &mut dungeon::Dungeon
+    ) {
         self.position.add(direction);
 
-        if new_dungeon.does_position_have_collision(&self.position) {
+        if dungeon.does_position_have_collision(&self.position) {
             self.materials += 1;
         }
 
-        new_dungeon.set_room(
-            &self.position, 
-            room::Room::new(
-                '.', 
-                self.position, 
-                0
-            )
-        );
-
-        new_dungeon
+        dungeon.set_room_as_empty(self.position);
     }
 
 
     fn build(
         &mut self, 
         direction: position::Position, 
-        dungeon: dungeon::Dungeon
-    ) -> dungeon::Dungeon {
+        dungeon: &mut dungeon::Dungeon
+    ) {
+        if self.materials <= 0 {
+            return;
+        }
 
         let build_pos = &self.position.plus(&direction);
         
-        if dungeon.does_position_have_collision(&build_pos) == false {
-            if self.materials <= 0 {
-                return dungeon;
-            }
-            self.materials -= 1;
+        if dungeon.does_position_have_collision(&build_pos) == true {
+            return;
         }
-        let mut new_dungeon = dungeon;
-        new_dungeon.erase_room(build_pos);
 
-        new_dungeon
+        self.materials -= 1;
+        dungeon.erase_room(build_pos);
     }
+
      
     fn place_light(
         &mut self, 
         direction: position::Position,
-        dungeon: dungeon::Dungeon
-    ) -> dungeon::Dungeon {
-        let mut new_dungeon = dungeon;
-        new_dungeon.lights.push(Light::new(10, self.position.plus(&direction)));
-        println!("{:?}", new_dungeon.lights);
-        new_dungeon
+        dungeon: &mut dungeon::Dungeon
+    ) {
+        dungeon.lights.push(Light::new(10, self.position.plus(&direction)));
     }
      
 
