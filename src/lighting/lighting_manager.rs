@@ -1,19 +1,17 @@
-use std::collections::HashMap;
-
-use crate::entities::position;
 use crate::dungeon::{dungeon, room};
 use crate::lighting::light;
 
 
 pub fn manage_light(
     lights: &Vec<light::Light>, 
-    dungeon: &dungeon::Dungeon
-) -> HashMap<position::Position, room::Room>{
-    let mut new_rooms = dungeon.rooms.clone();
-    for room in new_rooms.values_mut() {
-        room.is_lighted = is_room_visable(&lights, room);
+    dungeon: &mut dungeon::Dungeon
+) {
+    for room in dungeon.get_empty_rooms() {
+        dungeon.light_or_unlight_room_at_position(
+            is_room_visable(&lights, &room), 
+            &room.position
+        );
     }
-    new_rooms
 }
 
 

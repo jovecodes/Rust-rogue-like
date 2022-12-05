@@ -122,7 +122,7 @@ impl EntityManager {
 
     fn set_lighting(&mut self, dungeon: &mut dungeon::Dungeon) {
         let lights = self.get_lights(dungeon);
-        dungeon.rooms = lighting_manager::manage_light(&lights, &dungeon);
+        lighting_manager::manage_light(&lights, dungeon);
     }
 
 

@@ -46,7 +46,7 @@ fn play_with_new_game() {
     let player = player::Player::new(position::STOP, 0);
     let mut entity_manager = entity_manager::EntityManager::new(player, Vec::new(), 10);
 
-    walker.generate(300, &mut dungeon);
+    walker.generate(350, &mut dungeon);
     entity_manager.spawn_enemy(&mut dungeon);
     entity_manager.manage(&mut dungeon);
 
