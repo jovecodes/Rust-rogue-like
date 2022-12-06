@@ -15,9 +15,9 @@ pub struct Walker {
 impl Walker {
     pub fn new() -> Walker { 
         Walker {
-            position            : position::Position::new(0, 0),
-            steps_since_turn    : 0,
-            current_direction   : position::STOP,
+            position: position::Position::new(0, 0),
+            steps_since_turn: 0,
+            current_direction: position::STOP,
         }
     }
 
@@ -38,8 +38,7 @@ impl Walker {
 
 
     fn step(&mut self){
-        self.position.x += self.current_direction.x;
-        self.position.y += self.current_direction.y;
+        self.position.add(self.current_direction);
         self.steps_since_turn += 1;
     }
 

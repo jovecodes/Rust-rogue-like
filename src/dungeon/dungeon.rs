@@ -10,6 +10,7 @@ const WINDOW_WIDTH: i32 = 20;
 const WINDOW_HEIGHT: i32 = 13;
 const UNSEEN_ROOM_ART: char = '#';
 
+
 pub struct Dungeon {
     rooms: HashMap<position::Position, room::Room>,
     pub valid: bool,
@@ -52,8 +53,8 @@ impl Dungeon {
 
     pub fn print(&self, player: &player::Player, enemies: &Vec<enemy::Enemy>) {
         let pos = player.get_position();
-        for x in pos.x-WINDOW_HEIGHT..pos.x+WINDOW_HEIGHT {
-            for y in pos.y-WINDOW_WIDTH..pos.y+WINDOW_WIDTH {
+        for x in pos.get_x()-WINDOW_HEIGHT..pos.get_x()+WINDOW_HEIGHT {
+            for y in pos.get_y()-WINDOW_WIDTH..pos.get_y()+WINDOW_WIDTH {
 
                 let index = position::Position::new(x, y);
                 let mut art = UNSEEN_ROOM_ART;
@@ -120,25 +121,6 @@ impl Dungeon {
         self.rooms.values().cloned().collect::<Vec<room::Room>>()
     }
 
-
-    pub fn get_map_x(&self) -> Vec<i32> {
-
-        let mut x = Vec::new();
-        for (_, position) in &self.rooms {
-            x.append(&mut vec![position.position.x]);
-        }
-        x
-    }
-
-
-    pub fn get_map_y(&self) -> Vec<i32> {
-        let mut y = Vec::new();
-        for (_, position) in &self.rooms {
-            y.append(&mut vec![position.position.y]);
-        }
-        y
-    }
-    
     pub fn light_or_unlight_room_at_position(&mut self, should_light: bool, pos: &position::Position) {
         if self.rooms.contains_key(pos) == true {
             self.rooms.get_mut(pos).unwrap().is_lighted = should_light;

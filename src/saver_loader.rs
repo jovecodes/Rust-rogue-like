@@ -1,5 +1,6 @@
 use crate::dungeon::dungeon;
 use crate::entities::entity_manager;
+use crate::lighting::light::Light;
 use text_io::read;
 use serde_derive::{Serialize, Deserialize};
 use magic_crypt::MagicCryptTrait;
@@ -13,15 +14,71 @@ use super::entities::enemy::Enemy;
 
 
 #[derive(Serialize, Deserialize, Debug)]
+struct Pos {
+    x: i32,
+    y: i32,
+}
+
+
+impl Pos {
+   pub fn to_position(&self) -> Position {
+       Position::new(self.x, self.y)
+   }
+
+   pub fn from_position(pos: &Position) -> Pos {
+       Pos {x: pos.get_x(), y: pos.get_y()}
+   }
+
+   pub fn position_vec_to_pos_vec(positions: Vec<&Position>) -> Vec<Pos> {
+       let mut pos_vec = Vec::new();
+       for pos in positions {
+           pos_vec.push(Pos::from_position(pos));
+       }
+       pos_vec
+   }
+
+   pub fn pos_vec_to_position_vec(positions: &Vec<Pos>) -> Vec<Position> {
+       let mut pos_vec = Vec::new();
+       for pos in positions {
+           pos_vec.push(Pos::to_position(&pos));
+       }
+       pos_vec
+   }
+
+   pub fn room_vec_to_pos_vec(rooms: Vec<Room>) -> Vec<Pos> {
+       let mut pos_vec = Vec::new();
+       for i in rooms {
+            pos_vec.push(Pos::from_position(&i.position));
+       }
+       pos_vec
+   }
+
+   pub fn light_vec_to_pos_vec(rooms: &Vec<Light>) -> Vec<Pos> {
+       let mut pos_vec = Vec::new();
+       for i in rooms {
+            pos_vec.push(Pos::from_position(&i.get_position()));
+       }
+       pos_vec
+   }
+
+   pub fn pos_vec_to_light_vec(positions: &Vec<Pos>) -> Vec<Light> {
+       let mut pos_vec = Vec::new();
+       for pos in positions {
+           pos_vec.push(Light::new(10, Pos::to_position(&pos)));
+       }
+       pos_vec
+   }
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Saver {
-    pub dungeon_map_x: Vec<i32>,
-    pub dungeon_map_y: Vec<i32>,
-    pub player_pos_x: i32,
-    pub player_pos_y: i32,
-    pub player_materials: i32,
-    pub enemy_positions_x: Vec<i32>,
-    pub enemy_positions_y: Vec<i32>,
-    pub turns_till_spawn: i32,
+    dungeon_map: Vec<Pos>,
+    player_pos: Pos,
+    player_materials: i32,
+    enemy_positions: Vec<Pos>,
+    turns_till_spawn: i32,
+    light_positions: Vec<Pos>,
 }
 
 
@@ -37,14 +94,12 @@ impl Saver {
         manager: entity_manager::EntityManager,
     ) {
         let saver = Saver {   
-            dungeon_map_x: dungeon.get_map_x(), 
-            dungeon_map_y: dungeon.get_map_y(), 
-            player_pos_x: manager.player.get_position().x,
-            player_pos_y: manager.player.get_position().y,
+            dungeon_map: Pos::room_vec_to_pos_vec(dungeon.get_empty_rooms()),
+            player_pos: Pos::from_position(manager.player.get_position()),
             player_materials: manager.player.get_materials(),
-            enemy_positions_x: get_enemy_positions_x(&manager),
-            enemy_positions_y: get_enemy_positions_y(&manager),
+            enemy_positions: Pos::position_vec_to_pos_vec(manager.get_enemy_positions()),
             turns_till_spawn: manager.spawner.turns_till_spawn,
+            light_positions: Pos::light_vec_to_pos_vec(&dungeon.lights)
         };
         let mcrypt = new_magic_crypt!("magickey", 256);
         let serialized = serde_json::to_string(&saver).unwrap();
@@ -72,23 +127,14 @@ impl Loader {
 
         let dungeon = Loader::load_dungeon(&saver);
         let player = Player::new(
-            Position::new(saver.player_pos_x, saver.player_pos_y), 
+            saver.player_pos.to_position(), 
             saver.player_materials
         );
 
         let mut enemies = Vec::new();
 
-        for enemy in 0..saver.enemy_positions_x.len() {
-            enemies.append(&mut vec![
-                Enemy::new(
-                    Position::new(
-                        saver.enemy_positions_x[enemy], 
-                        saver.enemy_positions_y[enemy]
-                    )
-                    
-                )
-                
-            ])
+        for enemy in 0..saver.enemy_positions.len() {
+            enemies.push(Enemy::new(saver.enemy_positions[enemy].to_position()))
         }
 
         let manager = EntityManager::new(player, enemies, saver.turns_till_spawn);
@@ -100,45 +146,15 @@ impl Loader {
     
     fn load_dungeon(saver: &Saver) -> Dungeon {
         let mut dungeon = Dungeon::new();
-        let mut dungeon_map_pos = Vec::new();
+        let dungeon_map_positions = Pos::pos_vec_to_position_vec(&saver.dungeon_map);
         let mut map = Vec::new();
-        for index in 0..saver.dungeon_map_x.len() {
-            dungeon_map_pos.append(
-                &mut vec![Position::new(
-                    saver.dungeon_map_x[index], 
-                    saver.dungeon_map_y[index]
-                )]
-            )
+
+        for pos in dungeon_map_positions {
+            map.push(Room::new('.', pos, 0))
         }
 
-        for pos in dungeon_map_pos {
-            map.append(&mut vec![Room::new('.', pos, 0)])
-        }
         dungeon.load_map(map);
+        dungeon.lights.append(&mut Pos::pos_vec_to_light_vec(&saver.light_positions));
         dungeon
     }
-}
-
-
-fn get_enemy_positions_x(manager : &EntityManager) -> Vec<i32> {
-    let mut x = Vec::new();
-    let pos = manager.get_enemy_positions();
-
-    for i in pos {
-        x.append(&mut vec![i.x]);
-    }
-
-    x
-}
-
-
-fn get_enemy_positions_y(manager : &EntityManager) -> Vec<i32> {
-    let mut y = Vec::new();
-    let pos = manager.get_enemy_positions();
-
-    for i in pos {
-        y.append(&mut vec![i.y]);
-    }
-
-    y
 }

@@ -25,26 +25,28 @@ impl EntityManager {
 
     
     pub fn manage(&mut self, dungeon : &mut dungeon::Dungeon) {
+        self.set_lighting(dungeon);
         loop {
-            self.set_lighting(dungeon);
             dungeon.print(&self.player, &self.enemies);
 
-            if self.check_for_loss() { break; }
-
             self.player.do_action(dungeon);
+            self.set_lighting(dungeon);
+            self.manage_enemies(&dungeon);
+            self.spawn(dungeon);
 
-            if dungeon.valid == false {
+            if self.should_lose(&dungeon) {
                 break;
             }
-            
-            self.manage_enemies(&dungeon);
-
-            if self.spawner.should_spawn() {
-                self.spawn_enemy(dungeon);
-            }
         }
+        dungeon.print(&self.player, &self.enemies);
     }
 
+
+    fn spawn(&mut self, dungeon: &mut dungeon::Dungeon) {
+        if self.spawner.should_spawn() {
+            self.spawn_enemy(dungeon);
+        }
+    }
 
     pub fn spawn_enemy(&mut self, dungeon: &mut dungeon::Dungeon) {
         let valid_positions = EntityManager::get_spawnable_rooms(dungeon);
@@ -69,6 +71,10 @@ impl EntityManager {
     }
         
 
+    fn should_lose(&self, dungeon: &dungeon::Dungeon) -> bool {
+        return dungeon.valid == false || self.check_for_loss() == true;
+    }
+
     fn check_for_loss(&self) -> bool {
         for enemy in 0..self.enemies.len() {
             if self.enemies[enemy].get_position() == self.player.get_position() {
@@ -79,6 +85,15 @@ impl EntityManager {
         return false;
     }
 
+    pub fn get_enemy_positions(&self) -> Vec<&position::Position> {
+        let mut positions = Vec::new();
+
+        for enemy in 0..self.enemies.len() {
+            positions.push(self.enemies[enemy].get_position());
+        }
+
+        positions
+    }
 
     fn manage_enemies(&mut self, dungeon: &dungeon::Dungeon) {
         let mut new_enemies = self.kill_enemies(dungeon);
@@ -108,16 +123,6 @@ impl EntityManager {
         dungeon.does_position_have_collision(self.enemies[enemy].get_position())
     }
 
-
-    pub fn get_enemy_positions(&self) -> Vec<&position::Position> {
-        let mut positions = Vec::new();
-
-        for enemy in 0..self.enemies.len() {
-            positions.push(self.enemies[enemy].get_position());
-        }
-
-        positions
-    }
 
 
     fn set_lighting(&mut self, dungeon: &mut dungeon::Dungeon) {

@@ -17,7 +17,7 @@ impl Enemy {
         dungeon: &dungeon::Dungeon,
         manager: &EntityManager,
     ) {
-       let future_position = self.position.plus(&direction);
+       let future_position = self.position.get_add(&direction);
        if manager.does_position_have_collision(&future_position) == true {
             return;
        }
@@ -40,7 +40,7 @@ impl Enemy {
 
         let direction = pathfinding::pathfind(&self.position, player.get_position());
 
-        self.walk(position::Position::new(direction.x, direction.y), dungeon, manager);
+        self.walk(direction, dungeon, manager);
     }
 
 

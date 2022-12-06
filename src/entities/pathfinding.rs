@@ -5,7 +5,7 @@ pub fn pathfind(
     current: &Position, 
     target: &Position, 
 ) -> Position {
-    let mut point_vector = Position::new(target.x - current.x, target.y - current.y);
+    let mut point_vector = target.get_minus(current);
     point_vector.become_direction();
 
     return point_vector;

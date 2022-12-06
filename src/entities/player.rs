@@ -98,7 +98,7 @@ impl Player {
         &mut self, direction: position::Position, 
         dungeon: &dungeon::Dungeon
     ) {
-       let future_position = self.position.plus(&direction);
+       let future_position = self.position.get_add(&direction);
        if dungeon.does_position_have_collision(&future_position) == false {
             self.position.add(direction);
        }
@@ -129,7 +129,7 @@ impl Player {
             return;
         }
 
-        let build_pos = &self.position.plus(&direction);
+        let build_pos = &self.position.get_add(&direction);
         
         if dungeon.does_position_have_collision(&build_pos) == true {
             return;
@@ -145,7 +145,7 @@ impl Player {
         direction: position::Position,
         dungeon: &mut dungeon::Dungeon
     ) {
-        dungeon.lights.push(Light::new(10, self.position.plus(&direction)));
+        dungeon.lights.push(Light::new(10, self.position.get_add(&direction)));
     }
      
 

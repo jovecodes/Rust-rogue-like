@@ -9,11 +9,20 @@ pub const STOP  : Position = Position {x: 0, y: 0};
 
 
 #[derive(Clone, Copy, Hash, Eq, PartialEq, Debug, Serialize, Deserialize)]
-pub struct Position {pub x: i32,pub y: i32}
+pub struct Position {x: i32, y: i32}
 
 impl Position {
     pub fn new(x: i32, y:i32) -> Position {
         Position { x, y }
+    }
+
+
+    pub fn get_x(&self) -> i32 {
+        self.x
+    }
+
+    pub fn get_y(&self) -> i32 {
+        self.y
     }
 
 
@@ -33,6 +42,20 @@ impl Position {
         self.y += pos.y;
     } 
 
+    pub fn get_add(&self, pos: &Position) -> Position {
+        Position::new(
+            self.x + pos.x,
+            self.y + pos.y
+        )
+    }
+
+    pub fn get_minus(&self, pos: &Position) -> Position {
+        Position::new(
+            self.x - pos.x,
+            self.y - pos.y
+        )
+    }
+
 
     pub fn become_direction(&mut self) {
         if self.x.abs() > self.y.abs() {
@@ -44,13 +67,6 @@ impl Position {
         }
     }
 
-
-    pub fn plus(&self, pos: &Position) -> Position {
-        Position::new(
-            self.x + pos.x,
-            self.y + pos.y
-        )
-    }
 
     pub fn distance_to(&self, pos: &Position) -> f32 {
         let x = (self.x - pos.x).pow(2);
