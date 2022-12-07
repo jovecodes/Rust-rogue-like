@@ -95,7 +95,7 @@ impl Saver {
     ) {
         let saver = Saver {   
             dungeon_map: Pos::room_vec_to_pos_vec(dungeon.get_empty_rooms()),
-            player_pos: Pos::from_position(manager.player.get_position()),
+            player_pos: Pos::from_position(&manager.player.get_position()),
             player_materials: manager.player.get_materials(),
             enemy_positions: Pos::position_vec_to_pos_vec(manager.get_enemy_positions()),
             turns_till_spawn: manager.spawner.turns_till_spawn,

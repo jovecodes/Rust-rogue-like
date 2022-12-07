@@ -34,11 +34,11 @@ impl Enemy {
         player: &player::Player,
         manager: &EntityManager,
     ) {
-        if &self.position == player.get_position() {
+        if self.position == player.get_position() {
             return; 
         }
 
-        let direction = pathfinding::pathfind(&self.position, player.get_position());
+        let direction = pathfinding::pathfind(&self.position, &player.get_position());
 
         self.walk(direction, dungeon, manager);
     }

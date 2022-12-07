@@ -19,8 +19,4 @@ impl Light {
     pub fn get_position(&self) -> &position::Position {
         &self.position
     }
-
-    pub fn set_pos(&mut self, position: position::Position) {
-        self.position = position;
-    }
 }

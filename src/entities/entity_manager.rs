@@ -32,6 +32,7 @@ impl EntityManager {
             self.player.do_action(dungeon);
             self.set_lighting(dungeon);
             self.manage_enemies(&dungeon);
+            self.manage_robots(dungeon);
             self.spawn(dungeon);
 
             if self.should_lose(&dungeon) {
@@ -77,7 +78,7 @@ impl EntityManager {
 
     fn check_for_loss(&self) -> bool {
         for enemy in 0..self.enemies.len() {
-            if self.enemies[enemy].get_position() == self.player.get_position() {
+            if self.enemies[enemy].get_position() == &self.player.get_position() {
                 println!("You Lose!");
                 return true;
             }
@@ -104,6 +105,11 @@ impl EntityManager {
     }
 
 
+    fn manage_robots(&mut self, dungeon: &mut dungeon::Dungeon) {
+        dungeon.manage_robots();
+    }
+
+
     fn kill_enemies(&mut self, dungeon: &dungeon::Dungeon) -> Vec<enemy::Enemy> {
         let mut new_enemies = self.enemies.clone();
         for enemy in 0..self.enemies.len() {
@@ -122,7 +128,6 @@ impl EntityManager {
     ) -> bool {
         dungeon.does_position_have_collision(self.enemies[enemy].get_position())
     }
-
 
 
     fn set_lighting(&mut self, dungeon: &mut dungeon::Dungeon) {
